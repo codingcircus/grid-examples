@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Grid Tutorial</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
+	<style>
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .grid {
+      display: grid;
+      padding: 7px;
+      grid-template-columns: repeat(12, [col-start] 1fr);
+      grid-gap: 14px;
+      grid-auto-flow: dense;
+    }
+
+    .grid__item {
+      text-align: center;
+      color: #fff;
+      border-radius: 5px;
+      background-color: rgb(120,70,123);
+      border: 5px solid rgb(88,55,112);
+      grid-column-end: span 2;
+      grid-row-end: span 2;
+    }
+
+    .col-1 {
+      grid-column-end: span 1;
+    }
+
+    .col-3 {
+      grid-column-end: span 3;
+    }
+
+    .col-4 {
+      grid-column-end: span 4;
+    }
+
+    .row-1 {
+      grid-row-end: span 1;
+    }
+
+    .row-3 {
+      grid-row-end: span 3;
+    }
+
+    .row-4 {
+      grid-row-end: span 4;
+    }
+
+    .row-5 {
+      grid-row-end: span 5;
+    }
+
+    .row-6 {
+      grid-row-end: span 6;
+    }
+
+    .row-7 {
+      grid-row-end: span 7;
+    }
+
+    .row-8 {
+      grid-row-end: span 8;
+    }
+
+    .grid__item--transition-start {
+      transform-origin: top left;
+      opacity: 0;
+    }
+
+    .grid__item--transition-start.grid__item--transition-end {
+      transition: opacity .3s ease-in-out, transform .3s ease-in-out;
+      opacity: 1;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(2) {
+      transition-delay: .05s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(3) {
+      transition-delay: .1s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(4) {
+      transition-delay: .15s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(5) {
+      transition-delay: .2s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(6) {
+      transition-delay: .25s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(7) {
+      transition-delay: .3s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(8) {
+      transition-delay: .35s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(9) {
+      transition-delay: .4s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(10) {
+      transition-delay: .45s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(11) {
+      transition-delay: .5s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(12) {
+      transition-delay: .55s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(13) {
+      transition-delay: .6s;
+    }
+
+    .grid__item.grid__item--transition-end:nth-child(14) {
+      transition-delay: .65s;
+    }
+
+  </style>
+  <script>
+    window.addEventListener('load', () => {
+      const animateGrid = new AnimateGrid();
+      animateGrid.init();
+    });
+
+    class AnimateGrid {
+      constructor() {
+        this.gridRect = document.querySelector('.grid').getBoundingClientRect();
+        this.items = Array.from(document.querySelectorAll('.grid__item'));
+        this.resetTransitionClasses = this.resetTransitionClasses.bind(this);
+      }
+
+      init() {
+        this.items = this.addTransitionStartClass(this.items);
+
+        // Make sure items have start class
+        requestAnimationFrame(() => {
+          window.addEventListener('transitionend', this.resetTransitionClasses);
+          this.items = this.addTransitionEndClass(this.items);
+        });
+      }
+
+      addTransitionStartClass(items) {
+        return items.map(item => {
+          item = this.translateItemToGridStart(item);
+          item.classList.add('grid__item--transition-start')
+          return item;
+        });
+      }
+
+      addTransitionEndClass(items) {
+        return items.map(item => {
+          item = this.translateItemToPlace(item);
+          item.classList.add('grid__item--transition-end');
+          return item;
+        });
+      }
+
+      translateItemToGridStart(item) {
+        const rect = item.getBoundingClientRect();
+        const left = this.gridRect.left - rect.left;
+        const top = this.gridRect.top - rect.top;
+        item.style.transform = `translate(${left}px, ${top}px) scale(.1)`;
+        return item;
+      }
+
+      translateItemToPlace(item) {
+        item.style.transform = '';
+        return item;
+      }
+
+      resetTransitionClasses(ev) {
+        if (ev.target.classList.contains('grid__item--transition-end')) {
+          ev.target.classList.remove('grid__item--transition-start');
+          ev.target.classList.remove('grid__item--transition-end');
+          const index = this.items.find(item => item === ev.target);
+          this.items.splice(index, 1);
+        }
+
+        if (this.items.length <= 0) {
+          window.removeEventListener('transitionend', this.resetTransitionClasses);
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="grid">
+    <div class="grid__item col-4 row-6">A</div>
+    <div class="grid__item row-8">B</div>
+    <div class="grid__item">C</div>
+    <div class="grid__item col-4">D</div>
+    <div class="grid__item row-6">E</div>
+    <div class="grid__item col-1">F</div>
+    <div class="grid__item col-3">G</div>
+    <div class="grid__item col-4 row-7">H</div>
+    <div class="grid__item row-4">I</div>
+    <div class="grid__item row-1">J</div>
+    <div class="grid__item row-3">K</div>
+    <div class="grid__item col-4 row-4">L</div>
+    <div class="grid__item col-4 row-2">M</div>
+    <div class="grid__item col-4 row-1">N</div>
+  </div>
+</body>
+</html>
